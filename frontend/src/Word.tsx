@@ -15,7 +15,7 @@ const Word: React.FC<{
           <Letter
             key={challengeCharIndex}
             char={challengeChar}
-            correctStatus={progressStatus === "" || typedChar === "" ? "" : isCorrect ? "correct" : "incorrect"}
+            correctStatus={progressStatus === "" || typedChar === "" ? "" : isCorrect ? " correct" : " incorrect"}
           />
         );
       })}
@@ -24,7 +24,7 @@ const Word: React.FC<{
           .slice(challengeWord.length)
           .split("")
           .map((extraChar, index) => (
-            <Letter key={challengeWord.length - 1 + index} char={extraChar} correctStatus={"incorrect"} />
+            <Letter key={challengeWord.length - 1 + index} char={extraChar} correctStatus={" incorrect"} />
           ))}
     </span>
   );

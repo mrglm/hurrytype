@@ -77,6 +77,10 @@ button:focus-visible {
   color: darkred;
 }
 
+.done :not(.correct, .incorrect) {
+  text-decoration: underline darkred;
+}
+
 .current {
   text-decoration: underline lightblue;
 }
