@@ -3,7 +3,8 @@ import "./App.css";
 import axios, { AxiosResponse } from "axios";
 import { handleSpacePress, handleBackspacePress, handleLetterPress } from "./handleKeyPressHelpers";
 import WordsContainer from "./WordsContainer";
-import { isCorrectLetter, isCorrectSpace } from "./utils";
+import Metrics from "./Metrics";
+import { getColorBasedOnWpm, getWPM, isCorrectLetter, isCorrectSpace } from "./utils";
 
 const App: React.FC = () => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
@@ -26,27 +27,6 @@ const App: React.FC = () => {
     } catch (error) {
       throw new Error((error as Error).message);
     }
-  };
-
-  const getColorBasedOnWpm = (wpm: number) => {
-    if (isNaN(wpm) || wpm === Infinity) {
-      return "rgb(255 255 255 / 0.87)";
-    }
-    const minWpm = 30;
-    const maxWpm = 90;
-
-    const factor = Math.max(0, Math.min(Math.min((wpm - minWpm) / (maxWpm - minWpm), 1)));
-
-    const green = Math.round(factor * 255);
-    const blue = Math.round(255 - factor * 255);
-
-    console.log(wpm, factor, green, blue);
-
-    return `rgb(0 ${green} ${blue} / 0.87)`;
-  };
-
-  const getWPM = (nbKeystrokes: number, timer: number): number => {
-    return Math.round((nbKeystrokes / 5 / timer) * 60);
   };
 
   useEffect(() => {
@@ -140,11 +120,7 @@ const App: React.FC = () => {
       <section>
         <h2>{timer}</h2>
         <WordsContainer challengeWords={challengeWords} typedWords={typedWords} />
-        {isStarted && (
-          <h2>
-            Mistakes: {nbMistakes} | WPM: {getWPM(nbKeystrokes, timer)}
-          </h2>
-        )}
+        {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
       </section>
     </main>
   );
