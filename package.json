@@ -11,7 +11,13 @@
     "format-fix": "prettier --write . --config ./.prettierrc",
     "build": "concurrently \"npm run build --prefix backend\" \"npm run build --prefix frontend\"",
     "start": "concurrently \"npm run start --prefix backend\" \"npm run start --prefix frontend\"",
-    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "prepare": "husky install"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "keywords": [],
   "author": "",
@@ -29,6 +35,14 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.2",
     "eslint-plugin-react-hooks": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.2.10",
     "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
