@@ -23,9 +23,7 @@ const App = (): React.JSX.Element => {
   const fetchWords = async (nbWords: number): Promise<string[]> => {
     try {
       const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api");
-      console.log(response.data.randomWords.length);
       const res = response.data.randomWords.slice(0, nbWords);
-      console.log(res.length);
       return res;
     } catch (error) {
       throw new Error((error as Error).message);
