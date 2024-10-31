@@ -20,10 +20,13 @@ const App = (): React.JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setisLoading] = useState<boolean>(true);
 
-  const fetchWords = async (): Promise<string[]> => {
+  const fetchWords = async (nbWords: number): Promise<string[]> => {
     try {
       const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api");
-      return response.data.randomWords;
+      console.log(response.data.randomWords.length);
+      const res = response.data.randomWords.slice(0, nbWords);
+      console.log(res.length);
+      return res;
     } catch (error) {
       throw new Error((error as Error).message);
     }
@@ -33,7 +36,7 @@ const App = (): React.JSX.Element => {
     const async_helper = async () => {
       setisLoading(true);
       try {
-        const fetchedWords = await fetchWords();
+        const fetchedWords = await fetchWords(nbWordsSetting);
         setChallengeWords(fetchedWords);
       } catch (error) {
         setError((error as Error).message);
@@ -43,7 +46,7 @@ const App = (): React.JSX.Element => {
     };
 
     async_helper();
-  }, []);
+  }, [nbWordsSetting]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent): void => {
