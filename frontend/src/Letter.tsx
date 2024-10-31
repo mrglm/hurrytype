@@ -6,7 +6,7 @@ type LetterProps = {
 };
 
 const Letter = ({ char, correctStatus }: LetterProps): React.JSX.Element => {
-  return <span className={`letter${correctStatus}`}>{char}</span>;
+  return <span className={`letter ${correctStatus}`}>{char}</span>;
 };
 
 export default React.memo(Letter);
