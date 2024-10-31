@@ -1,11 +1,13 @@
 import React from "react";
 import Letter from "./Letter";
 
-const Word: React.FC<{
+type WordProps = {
   challengeWord: string;
   typedWord: string;
   progressStatus: string;
-}> = ({ challengeWord, typedWord, progressStatus }) => {
+};
+
+const Word = ({ challengeWord, typedWord, progressStatus }: WordProps): React.JSX.Element => {
   return (
     <span className={`word ${progressStatus}`}>
       {challengeWord.split("").map((challengeChar, challengeCharIndex) => {

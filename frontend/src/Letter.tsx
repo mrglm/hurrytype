@@ -1,11 +1,11 @@
 import React from "react";
 
-interface LetterProps {
+type LetterProps = {
   char: string;
   correctStatus: string;
-}
+};
 
-const Letter: React.FC<LetterProps> = ({ char, correctStatus }) => {
+const Letter = ({ char, correctStatus }: LetterProps): React.JSX.Element => {
   return <span className={`letter${correctStatus}`}>{char}</span>;
 };
 
