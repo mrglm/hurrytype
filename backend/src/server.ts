@@ -18,13 +18,12 @@ const wordsArray = fs
   .map((word) => word.trim().toLowerCase())
   .filter(Boolean);
 
-const getRandomWords = (words: string[], count: number): string[] => {
-  const shuffled = [...words].sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
+const getRandomWords = (words: string[]): string[] => {
+  return [...words].sort(() => 0.5 - Math.random());
 };
 
 app.get("/api", (req, res) => {
-  const randomWords = getRandomWords(wordsArray, 50);
+  const randomWords = getRandomWords(wordsArray);
   res.json({ randomWords: randomWords });
 });
 
