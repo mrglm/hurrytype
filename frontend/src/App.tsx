@@ -6,7 +6,7 @@ import WordsContainer from "./WordsContainer";
 import Metrics from "./Metrics";
 import { getColorBasedOnWpm, getWPM, isCorrectLetter, isCorrectSpace } from "./utils";
 
-const App: React.FC = () => {
+const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
   const [typedWords, setTypedWords] = useState<string[]>([""]);
 

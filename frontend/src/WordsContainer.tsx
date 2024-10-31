@@ -1,10 +1,12 @@
 import React from "react";
 import Word from "./Word";
 
-const WordsContainer: React.FC<{
+type WordsContainerProps = {
   challengeWords: string[];
   typedWords: string[];
-}> = ({ challengeWords, typedWords }) => {
+};
+
+const WordsContainer = ({ challengeWords, typedWords }: WordsContainerProps): React.JSX.Element => {
   return (
     <div className="words-container">
       {challengeWords.map((challengeWord, challengeWordIndex) => (
