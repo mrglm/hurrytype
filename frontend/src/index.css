@@ -46,9 +46,11 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
@@ -83,4 +85,17 @@ button:focus-visible {
 
 .current {
   text-decoration: underline lightskyblue;
+}
+
+.setting-selector-btn {
+  padding: 10px 10px;
+  border: "none";
+  border-radius: 5px;
+  cursor: "pointer";
+  background-color: inherit;
+}
+
+.setting-selector-btn.selected {
+  color: lightskyblue;
+  border-color: lightskyblue;
 }

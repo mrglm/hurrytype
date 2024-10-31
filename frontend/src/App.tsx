@@ -4,11 +4,14 @@ import axios, { AxiosResponse } from "axios";
 import { handleSpacePress, handleBackspacePress, handleLetterPress } from "./handleKeyPressHelpers";
 import WordsContainer from "./WordsContainer";
 import Metrics from "./Metrics";
+import SettingsSelector from "./SettingsSelector";
 import { getColorBasedOnWpm, getWPM, isCorrectLetter, isCorrectSpace } from "./utils";
 
 const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
   const [typedWords, setTypedWords] = useState<string[]>([""]);
+
+  const [nbWordsSetting, setNbWordsSetting] = useState<number>(10);
 
   const [timer, setTimer] = useState<number>(0);
   const [nbMistakes, setNbMistakes] = useState<number>(0);
@@ -122,6 +125,14 @@ const App = (): React.JSX.Element => {
         <h2>{timer}</h2>
         <WordsContainer challengeWords={challengeWords} typedWords={typedWords} />
         {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
+        {!isStarted && (
+          <SettingsSelector
+            settingName={"Words"}
+            settingValue={nbWordsSetting}
+            setSetting={setNbWordsSetting}
+            settingOptions={[10, 25, 50, 100]}
+          />
+        )}
       </section>
     </main>
   );
