@@ -51,13 +51,13 @@ const App = (): React.JSX.Element => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent): void => {
-      if (!isStarted) {
-        setIsStarted(true);
-      }
       if (isFinished) {
         return;
       }
       if (event.key === " ") {
+        if (!isStarted) {
+          setIsStarted(true);
+        }
         event.preventDefault(); // avoid scrolling down
         const updatedTypedWords = handleSpacePress(typedWords);
         setTypedWords(updatedTypedWords);
@@ -69,6 +69,10 @@ const App = (): React.JSX.Element => {
         setTypedWords(handleBackspacePress(typedWords));
         setNbKeystrokes((prev) => prev - 1);
       } else if (event.key.length === 1) {
+        if (!isStarted) {
+          setIsStarted(true);
+        }
+        event.preventDefault(); // avoid launching search
         const updatedTypedWords = handleLetterPress(typedWords, event.key);
         setTypedWords(updatedTypedWords);
         setNbKeystrokes((prev) => prev + 1);
