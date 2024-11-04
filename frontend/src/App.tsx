@@ -5,13 +5,20 @@ import { handleSpacePress, handleBackspacePress, handleLetterPress } from "./han
 import WordsContainer from "./WordsContainer";
 import Metrics from "./Metrics";
 import SettingsSelector from "./SettingsSelector";
-import { getColorBasedOnWpm, getWPM, isCorrectLetter, isCorrectSpace } from "./utils";
+import {
+  getColorBasedOnWpm,
+  getWPM,
+  isCorrectLetter,
+  isCorrectSpace,
+  isFinishedMistakes,
+  isFinishedWords,
+} from "./utils";
+import { Setting } from "./types";
+import SettingsContext from "./SelectedSettingContext";
 
 const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
   const [typedWords, setTypedWords] = useState<string[]>([""]);
-
-  const [nbWordsSetting, setNbWordsSetting] = useState<number>(10);
 
   const [timer, setTimer] = useState<number>(0);
   const [nbMistakes, setNbMistakes] = useState<number>(0);
@@ -23,6 +30,26 @@ const App = (): React.JSX.Element => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setisLoading] = useState<boolean>(true);
 
+  const [nbWordsSetting, setNbWordsSetting] = useState<number>(10);
+  const [nbMistakesSetting, setNbMistakesSetting] = useState<number>(1);
+
+  const settingsList = [
+    {
+      settingName: "Words",
+      settingValue: 10,
+      setSetting: setNbWordsSetting,
+      settingOptions: [10, 25, 50, 100],
+    },
+    {
+      settingName: "Mistakes",
+      settingValue: 1,
+      setSetting: setNbMistakesSetting,
+      settingOptions: [1, 2, 5, 10],
+    },
+  ];
+
+  const [selectedSetting, setSelectedSetting] = useState<Setting>(settingsList[0]);
+
   const fetchWords = async (nbWords: number): Promise<string[]> => {
     try {
       const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api");
@@ -32,6 +59,13 @@ const App = (): React.JSX.Element => {
       throw new Error((error as Error).message);
     }
   };
+
+  useEffect(() => {
+    selectedSetting.setSetting(selectedSetting.settingValue);
+    if (selectedSetting.settingName !== "Words") {
+      setNbWordsSetting(100);
+    }
+  }, [selectedSetting]);
 
   useEffect(() => {
     const async_helper = async () => {
@@ -45,9 +79,8 @@ const App = (): React.JSX.Element => {
         setisLoading(false);
       }
     };
-
     async_helper();
-  }, [nbWordsSetting]);
+  }, [nbWordsSetting, selectedSetting]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent): void => {
@@ -100,17 +133,15 @@ const App = (): React.JSX.Element => {
   }, [isFinished, isStarted]);
 
   useEffect(() => {
-    const typedWordsLength = typedWords.length;
-    const challengeWordsLength = challengeWords.length;
+    const settingName = selectedSetting.settingName;
     if (
-      !isLoading &&
-      (typedWordsLength > challengeWordsLength ||
-        (typedWordsLength === challengeWordsLength &&
-          typedWords[typedWordsLength - 1].length === challengeWords[challengeWordsLength - 1].length))
+      isStarted &&
+      ((settingName === "Words" && isFinishedWords(typedWords, challengeWords)) ||
+        (settingName === "Mistakes" && isFinishedMistakes(nbMistakes, nbMistakesSetting)))
     ) {
       setIsFinished(true);
     }
-  }, [isLoading, typedWords, challengeWords]);
+  }, [isStarted, typedWords, challengeWords, nbMistakes, nbMistakesSetting, selectedSetting]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -128,15 +159,10 @@ const App = (): React.JSX.Element => {
       <section>
         <h2>{timer}</h2>
         <WordsContainer challengeWords={challengeWords} typedWords={typedWords} />
-        {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
-        {!isStarted && (
-          <SettingsSelector
-            settingName={"Words"}
-            settingValue={nbWordsSetting}
-            setSetting={setNbWordsSetting}
-            settingOptions={[10, 25, 50, 100]}
-          />
-        )}
+        <SettingsContext.Provider value={{ selectedSetting: selectedSetting, setSelectedSetting: setSelectedSetting }}>
+          {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
+          {!isStarted && <SettingsSelector settingsList={settingsList} />}
+        </SettingsContext.Provider>
       </section>
     </main>
   );
