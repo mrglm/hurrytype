@@ -30,3 +30,17 @@ export const getWPM = (nbKeystrokes: number, timer: number): number => {
   }
   return wpm;
 };
+
+export const isFinishedWords = (typedWords: string[], challengeWords: string[]): boolean => {
+  const typedWordsLength = typedWords.length;
+  const challengeWordsLength = challengeWords.length;
+  return (
+    typedWordsLength > challengeWordsLength ||
+    (typedWordsLength === challengeWordsLength &&
+      typedWords[typedWordsLength - 1].length === challengeWords[challengeWordsLength - 1].length)
+  );
+};
+
+export const isFinishedMistakes = (nbMistakes: number, nbMistakesSetting: number): boolean => {
+  return nbMistakes === nbMistakesSetting;
+};

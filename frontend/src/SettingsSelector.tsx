@@ -1,30 +1,49 @@
-import React from "react";
+import { useContext } from "react";
+import { Setting } from "./types";
+import SettingsContext from "./SelectedSettingContext";
 
 type SettingSelectorProps = {
-  settingName: string;
-  settingValue: number;
-  setSetting: (option: number) => void;
-  settingOptions: number[];
+  settingsList: Setting[];
 };
 
-const SettingsSelector = ({
-  settingName,
-  settingValue,
-  setSetting,
-  settingOptions,
-}: SettingSelectorProps): React.JSX.Element => {
-  const handleButtonClick = (option: number) => {
-    setSetting(option);
+const SettingsSelector = ({ settingsList }: SettingSelectorProps): React.JSX.Element => {
+  const context = useContext(SettingsContext);
+  if (!context) {
+    throw new Error("SelectedSettingContext is null");
+  }
+  const { selectedSetting, setSelectedSetting } = context;
+
+  const handleSettingChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+    setSelectedSetting(settingsList[parseInt(event.target.value)]);
+  };
+
+  const handleOptionChange = (option: number): void => {
+    console.log(option);
+    setSelectedSetting({
+      ...selectedSetting,
+      settingValue: option,
+    });
   };
 
   return (
-    <h2 className="setting-selector">
-      {`${settingName} options :`}
-      {settingOptions.map((option) => (
+    <h2 className="settings-selector">
+      <select onChange={handleSettingChange}>
+        {settingsList.map((setting, index) => (
+          <option
+            key={index}
+            value={index}
+            className={selectedSetting.settingName === setting.settingName ? "selected" : ""}
+          >
+            {setting.settingName}
+          </option>
+        ))}
+      </select>
+      {selectedSetting.settingOptions.map((option, index) => (
         <button
-          className={`setting-selector-btn ${option === settingValue ? "selected" : ""}`}
-          onClick={() => handleButtonClick(option)}
-          key={option}
+          className={`setting-selector-btn ${option === selectedSetting.settingValue ? "selected" : ""}`}
+          onClick={() => handleOptionChange(option)}
+          key={index}
+          value={index}
         >
           {option}
         </button>
