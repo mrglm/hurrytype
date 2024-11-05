@@ -18,7 +18,6 @@ const SettingsSelector = ({ settingsList }: SettingSelectorProps): React.JSX.Ele
   };
 
   const handleOptionChange = (option: number): void => {
-    console.log(option);
     setSelectedSetting({
       ...selectedSetting,
       settingValue: option,

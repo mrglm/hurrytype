@@ -15,6 +15,7 @@ import {
 } from "./utils";
 import { Setting } from "./types";
 import SettingsContext from "./context/SelectedSettingContext";
+import WordsContext from "./context/WordsContext";
 
 const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
@@ -158,11 +159,15 @@ const App = (): React.JSX.Element => {
       </h1>
       <section>
         <h2>{timer}</h2>
-        <WordsContainer challengeWords={challengeWords} typedWords={typedWords} />
-        <SettingsContext.Provider value={{ selectedSetting: selectedSetting, setSelectedSetting: setSelectedSetting }}>
-          {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
-          {!isStarted && <SettingsSelector settingsList={settingsList} />}
-        </SettingsContext.Provider>
+        <WordsContext.Provider value={{ challengeWords: challengeWords, typedWords: typedWords }}>
+          <WordsContainer />
+          <SettingsContext.Provider
+            value={{ selectedSetting: selectedSetting, setSelectedSetting: setSelectedSetting }}
+          >
+            {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
+            {!isStarted && <SettingsSelector settingsList={settingsList} />}
+          </SettingsContext.Provider>
+        </WordsContext.Provider>
       </section>
     </main>
   );
