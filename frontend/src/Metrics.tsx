@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import SettingsContext from "./SelectedSettingContext";
+import SettingsContext from "./context/SelectedSettingContext";
 
 type MetricsProps = { nbMistakes: number; wpm: number };
 

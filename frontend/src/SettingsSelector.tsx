@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Setting } from "./types";
-import SettingsContext from "./SelectedSettingContext";
+import SettingsContext from "./context/SelectedSettingContext";
 
 type SettingSelectorProps = {
   settingsList: Setting[];
