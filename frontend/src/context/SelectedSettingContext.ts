@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import { Setting } from "./types";
+import { Setting } from "../types";
 
 type SelectedSettingContextType = {
   selectedSetting: Setting;

@@ -14,7 +14,7 @@ import {
   isFinishedWords,
 } from "./utils";
 import { Setting } from "./types";
-import SettingsContext from "./SelectedSettingContext";
+import SettingsContext from "./context/SelectedSettingContext";
 
 const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
