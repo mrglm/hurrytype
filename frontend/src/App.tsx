@@ -53,7 +53,7 @@ const App = (): React.JSX.Element => {
 
   const fetchWords = async (nbWords: number): Promise<string[]> => {
     try {
-      const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api");
+      const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api/words");
       const res = response.data.randomWords.slice(0, nbWords);
       return res;
     } catch (error) {
