@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import "./App.css";
-import axios, { AxiosResponse } from "axios";
 import { handleSpacePress, handleBackspacePress, handleLetterPress } from "./handleKeyPressHelpers";
 import WordsContainer from "./WordsContainer";
 import Metrics from "./Metrics";
@@ -16,6 +15,7 @@ import {
 import { Setting } from "./types";
 import SettingsContext from "./context/SelectedSettingContext";
 import WordsContext from "./context/WordsContext";
+import { apiFetchResults, apiFetchWords, apiSendResult, ResultData } from "./api";
 
 const App = (): React.JSX.Element => {
   const [challengeWords, setChallengeWords] = useState<string[]>([]);
@@ -34,6 +34,8 @@ const App = (): React.JSX.Element => {
   const [nbWordsSetting, setNbWordsSetting] = useState<number>(10);
   const [nbMistakesSetting, setNbMistakesSetting] = useState<number>(1);
 
+  const [results, setResults] = useState<ResultData[]>([]);
+
   const settingsList = [
     {
       settingName: "Words",
@@ -51,16 +53,6 @@ const App = (): React.JSX.Element => {
 
   const [selectedSetting, setSelectedSetting] = useState<Setting>(settingsList[0]);
 
-  const fetchWords = async (nbWords: number): Promise<string[]> => {
-    try {
-      const response: AxiosResponse<{ randomWords: string[] }> = await axios.get("http://localhost:8080/api/words");
-      const res = response.data.randomWords.slice(0, nbWords);
-      return res;
-    } catch (error) {
-      throw new Error((error as Error).message);
-    }
-  };
-
   useEffect(() => {
     selectedSetting.setSetting(selectedSetting.settingValue);
     if (selectedSetting.settingName !== "Words") {
@@ -72,7 +64,7 @@ const App = (): React.JSX.Element => {
     const async_helper = async () => {
       setisLoading(true);
       try {
-        const fetchedWords = await fetchWords(nbWordsSetting);
+        const fetchedWords = await apiFetchWords(nbWordsSetting);
         setChallengeWords(fetchedWords);
       } catch (error) {
         setError((error as Error).message);
@@ -144,6 +136,25 @@ const App = (): React.JSX.Element => {
     }
   }, [isStarted, typedWords, challengeWords, nbMistakes, nbMistakesSetting, selectedSetting]);
 
+  useEffect(() => {
+    const fetchResults = async () => {
+      const results = await apiFetchResults();
+      setResults(results);
+    };
+
+    if (isFinished && selectedSetting.settingName === "Words") {
+      const resultData = {
+        username: "Anonymous",
+        nbWords: nbWordsSetting,
+        nbMistakes: nbMistakes,
+        timer: timer,
+      };
+
+      apiSendResult(resultData);
+      fetchResults();
+    }
+  }, [isFinished, nbMistakes, nbWordsSetting, selectedSetting.settingName, timer]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -158,16 +169,34 @@ const App = (): React.JSX.Element => {
         HurryType
       </h1>
       <section>
-        <h2>{timer}</h2>
-        <WordsContext.Provider value={{ challengeWords: challengeWords, typedWords: typedWords }}>
-          <WordsContainer />
-          <SettingsContext.Provider
-            value={{ selectedSetting: selectedSetting, setSelectedSetting: setSelectedSetting }}
-          >
-            {isStarted && <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />}
-            {!isStarted && <SettingsSelector settingsList={settingsList} />}
-          </SettingsContext.Provider>
-        </WordsContext.Provider>
+        {!isFinished ? (
+          <>
+            <h2>{timer}</h2>
+            <WordsContext.Provider value={{ challengeWords: challengeWords, typedWords: typedWords }}>
+              <WordsContainer />
+              <SettingsContext.Provider
+                value={{ selectedSetting: selectedSetting, setSelectedSetting: setSelectedSetting }}
+              >
+                {isStarted ? (
+                  <Metrics nbMistakes={nbMistakes} wpm={getWPM(nbKeystrokes, timer)} />
+                ) : (
+                  <SettingsSelector settingsList={settingsList} />
+                )}
+              </SettingsContext.Provider>
+            </WordsContext.Provider>
+          </>
+        ) : (
+          <>
+            <h2>Results</h2>
+            <ul>
+              {results.map((result, index) => (
+                <li key={index}>
+                  {result.username} - {result.nbWords} words - {result.nbMistakes} mistakes - {result.timer}s
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </section>
     </main>
   );
