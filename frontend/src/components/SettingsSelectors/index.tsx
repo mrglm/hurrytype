@@ -1,18 +1,16 @@
-import { useContext } from "react";
-import { Setting } from "./types";
-import SettingsContext from "./context/SelectedSettingContext";
+import { Setting } from "../../types";
 
 type SettingSelectorProps = {
   settingsList: Setting[];
+  selectedSetting: Setting;
+  setSelectedSetting: React.Dispatch<React.SetStateAction<Setting>>;
 };
 
-const SettingsSelector = ({ settingsList }: SettingSelectorProps): React.JSX.Element => {
-  const context = useContext(SettingsContext);
-  if (!context) {
-    throw new Error("SelectedSettingContext is null");
-  }
-  const { selectedSetting, setSelectedSetting } = context;
-
+const SettingsSelector = ({
+  settingsList,
+  selectedSetting,
+  setSelectedSetting,
+}: SettingSelectorProps): React.JSX.Element => {
   const handleSettingChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
     setSelectedSetting(settingsList[parseInt(event.target.value)]);
   };
