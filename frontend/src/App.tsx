@@ -4,7 +4,7 @@ import Timer from "./components/Timer";
 import WordsContainer from "./components/WordsContainer/index";
 import Metrics from "./components/Metrics/index";
 import SettingsSelector from "./components/SettingsSelectors/index";
-import { getColorBasedOnWpm, getWPM, isFinishedMistakes, isFinishedWords } from "./utils";
+import { getColorBasedOnWPM, getWPM, isFinishedMistakes, isFinishedWords } from "./utils";
 import { Setting } from "./types";
 import { apiFetchResults, apiFetchWords, apiSendResult, ResultData } from "./api";
 
@@ -150,7 +150,7 @@ const App = (): React.JSX.Element => {
     <main>
       <h1
         style={{
-          color: isStarted ? getColorBasedOnWpm(getWPM(nbKeystrokes, timerRef.current)) : "rgb(255 255 255 / 0.87)",
+          color: isStarted ? getColorBasedOnWPM(getWPM(nbKeystrokes, timerRef.current)) : "rgb(255 255 255 / 0.87)",
         }}
       >
         HurryType

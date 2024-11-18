@@ -11,7 +11,7 @@ export const isCorrectSpace = (challengeWords: string[], typedWords: string[]): 
   return typedWords[typedWordIndex].length >= challengeWords[typedWordIndex].length;
 };
 
-export const getColorBasedOnWpm = (wpm: number) => {
+export const getColorBasedOnWPM = (wpm: number) => {
   const minWpm = 30;
   const maxWpm = 90;
 
