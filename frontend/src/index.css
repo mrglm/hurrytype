@@ -80,7 +80,8 @@ button:focus-visible {
   color: lightgreen;
 }
 
-.incorrect {
+.incorrect,
+.extra {
   color: darkred;
 }
 
@@ -88,7 +89,7 @@ button:focus-visible {
   text-decoration: underline darkred 3px;
 }
 
-.current {
+.current :not(.extra) {
   text-decoration: underline lightskyblue 3px;
 }
 
