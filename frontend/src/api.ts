@@ -17,9 +17,9 @@ export const apiFetchWords = async (nbWords: number): Promise<string[]> => {
   }
 };
 
-export const apiSendResult = (resultData: ResultData): void => {
+export const apiSendResult = async (resultData: ResultData): Promise<void> => {
   try {
-    axios.post("http://localhost:8080/api/results", { params: resultData });
+    await axios.post("http://localhost:8080/api/results", { params: resultData });
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       console.error(error.response.data.error);
