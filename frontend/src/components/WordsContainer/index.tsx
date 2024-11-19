@@ -100,7 +100,7 @@ const WordsContainer = ({
     const settingName = selectedSetting.settingName;
     if (
       isStarted &&
-      ((settingName === "Words" && isFinishedWords(typedWords, challengeWords)) ||
+      ((settingName === "Words" && isFinishedWords(typedWords, typedWordsIndex, challengeWords)) ||
         (settingName === "Mistakes" && isFinishedMistakes(nbMistakes, selectedSetting.settingValue)))
     ) {
       setIsFinished(true);
@@ -113,6 +113,7 @@ const WordsContainer = ({
     selectedSetting.settingValue,
     setIsFinished,
     typedWords,
+    typedWordsIndex,
   ]);
 
   if (isLoading) {
