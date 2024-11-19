@@ -4,27 +4,23 @@ import Timer from "./components/Timer";
 import WordsContainer from "./components/WordsContainer/index";
 import Metrics from "./components/Metrics/index";
 import SettingsSelector from "./components/SettingsSelectors/index";
-import { getColorBasedOnWPM, getWPM, isFinishedMistakes, isFinishedWords } from "./utils";
+import { getColorBasedOnWPM, getWPM } from "./utils";
 import { Setting } from "./types";
-import { apiFetchResults, apiFetchWords, apiSendResult, ResultData } from "./api";
+import { apiFetchResults, apiSendResult, ResultData } from "./api";
 
 const App = (): React.JSX.Element => {
-  // app status states
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setisLoading] = useState<boolean>(false);
-
   // game status states
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [isFinished, setIsFinished] = useState<boolean>(false);
-  const [challengeWords, setChallengeWords] = useState<string[]>([]);
   const timerRef = useRef<number>(0);
 
   // user input states
-  const [typedWords, setTypedWords] = useState<string[]>([]);
-  const [typedWordsIndex, setTypedWordsIndex] = useState<number>(0);
-  const [nbMistakes, setNbMistakes] = useState<number>(0);
+  const updateNbKeystrokes = useCallback((nbKeystrokeChange: number) => {
+    setNbKeystrokes((prev) => prev + nbKeystrokeChange);
+  }, []);
   const [nbKeystrokes, setNbKeystrokes] = useState<number>(0);
-  const incrementNbMistakes = useCallback(() => {
+  const [nbMistakes, setNbMistakes] = useState<number>(0);
+  const updateNbMistakes = useCallback(() => {
     setNbMistakes((prev) => prev + 1);
   }, []);
 
@@ -46,80 +42,6 @@ const App = (): React.JSX.Element => {
   const [results, setResults] = useState<ResultData[]>([]);
 
   useEffect(() => {
-    const async_helper = async () => {
-      setisLoading(true);
-      try {
-        const fetchedWords = await apiFetchWords(
-          selectedSetting.settingName === "Words" ? selectedSetting.settingValue : 1000,
-        );
-        setChallengeWords(fetchedWords);
-        setTypedWords(fetchedWords.map(() => ""));
-      } catch (error) {
-        setError((error as Error).message);
-      } finally {
-        setisLoading(false);
-      }
-    };
-    async_helper();
-  }, [selectedSetting]);
-
-  const handleKeyPress = useCallback(
-    (event: KeyboardEvent) => {
-      let keystrokeChange = 0;
-      let updatedTypedWords = [...typedWords];
-      const lastTypedWord = typedWords[typedWordsIndex];
-      if (event.key === " ") {
-        setIsStarted(true);
-        event.preventDefault(); // avoid scrolling down
-        if (lastTypedWord === "") {
-          updatedTypedWords[typedWordsIndex] = " ";
-        } else {
-          setTypedWordsIndex((prev) => prev + 1);
-        }
-        keystrokeChange = 1;
-      } else if (event.key === "Backspace") {
-        if (lastTypedWord === "" && typedWordsIndex != 0) {
-          setTypedWordsIndex((prev) => prev - 1);
-        } else {
-          updatedTypedWords[typedWordsIndex] = lastTypedWord.slice(0, -1);
-        }
-        keystrokeChange = -1;
-      } else if (event.key.length === 1) {
-        setIsStarted(true);
-        event.preventDefault(); // avoid launching search
-        updatedTypedWords[typedWordsIndex] += event.key;
-        keystrokeChange = 1;
-      }
-      setTypedWords(updatedTypedWords);
-      setNbKeystrokes((prev) => prev + keystrokeChange);
-    },
-    [setIsStarted, typedWords, typedWordsIndex],
-  );
-
-  useEffect(() => {
-    if (isFinished) {
-      return;
-    }
-
-    window.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [isFinished, handleKeyPress]);
-
-  useEffect(() => {
-    const settingName = selectedSetting.settingName;
-    if (
-      isStarted &&
-      ((settingName === "Words" && isFinishedWords(typedWords, challengeWords)) ||
-        (settingName === "Mistakes" && isFinishedMistakes(nbMistakes, selectedSetting.settingValue)))
-    ) {
-      setIsFinished(true);
-    }
-  }, [challengeWords, isStarted, nbMistakes, selectedSetting.settingName, selectedSetting.settingValue, typedWords]);
-
-  useEffect(() => {
     const fetchResults = async () => {
       const results = await apiFetchResults();
       setResults(results);
@@ -138,14 +60,6 @@ const App = (): React.JSX.Element => {
     }
   }, [isFinished, nbMistakes, selectedSetting, timerRef]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>;
-  }
-
   return (
     <main>
       <h1
@@ -160,10 +74,14 @@ const App = (): React.JSX.Element => {
           <>
             <Timer isStarted={isStarted} isFinished={isFinished} timerRef={timerRef} />
             <WordsContainer
-              challengeWords={challengeWords}
-              typedWords={typedWords}
-              typedWordsIndex={typedWordsIndex}
-              incrementNbMistakes={incrementNbMistakes}
+              selectedSetting={selectedSetting}
+              nbMistakes={nbMistakes}
+              isStarted={isStarted}
+              setIsStarted={setIsStarted}
+              isFinished={isFinished}
+              setIsFinished={setIsFinished}
+              updateNbKeystrokes={updateNbKeystrokes}
+              updateNbMistakes={updateNbMistakes}
             />
             {isStarted ? (
               <Metrics
