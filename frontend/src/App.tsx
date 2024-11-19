@@ -42,22 +42,21 @@ const App = (): React.JSX.Element => {
   const [results, setResults] = useState<ResultData[]>([]);
 
   useEffect(() => {
-    const fetchResults = async () => {
-      const results = await apiFetchResults();
-      setResults(results);
+    const handleResults = async () => {
+      if (isFinished && selectedSetting.settingName === "Words") {
+        const resultData = {
+          username: "Anonymous",
+          nbWords: selectedSetting.settingValue,
+          nbMistakes: nbMistakes,
+          timer: timerRef.current,
+        };
+
+        await apiSendResult(resultData);
+        const results = await apiFetchResults();
+        setResults(results);
+      }
     };
-
-    if (isFinished && selectedSetting.settingName === "Words") {
-      const resultData = {
-        username: "Anonymous",
-        nbWords: selectedSetting.settingValue,
-        nbMistakes: nbMistakes,
-        timer: timerRef.current,
-      };
-
-      apiSendResult(resultData);
-      fetchResults();
-    }
+    handleResults();
   }, [isFinished, nbMistakes, selectedSetting, timerRef]);
 
   return (
