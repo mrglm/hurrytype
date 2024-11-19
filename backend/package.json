@@ -5,14 +5,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -b .",
-    "start": "tsx src/server.ts",
-    "dev": "tsx watch src/server.ts"
+    "start": "concurrently \"tsx src/launch_db.ts\" \"tsx src/server.ts\"",
+    "dev": "concurrently \"tsx src/launch_db.ts\" \"tsx watch src/server.ts\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "concurrently": "^9.1.0",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "mongoose": "^8.8.0",

@@ -42,7 +42,7 @@ export const apiFetchResults = async (): Promise<ResultData[]> => {
     if (axios.isAxiosError(error) && error.response) {
       console.error(error.response.data.error);
     } else {
-      console.error("Unexpected while sending results error:", error);
+      console.error("Unexpected while getting results error:", error);
     }
     return [];
   }
