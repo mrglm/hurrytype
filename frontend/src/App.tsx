@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import "./App.css";
 import Timer from "./components/Timer";
 import WordsContainer from "./components/WordsContainer/index";
 import Metrics from "./components/Metrics/index";

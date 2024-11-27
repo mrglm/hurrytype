@@ -30,3 +30,22 @@ export const isFinishedWords = (typedWords: string[], typedWordsIndex: number, c
 export const isFinishedMistakes = (nbMistakes: number, nbMistakesSetting: number): boolean => {
   return nbMistakes === nbMistakesSetting;
 };
+
+export const measureWordWidth = (word: string, containerRef: React.RefObject<HTMLDivElement>): number => {
+  if (!containerRef.current) {
+    return 0;
+  }
+
+  const tempSpan = document.createElement("span");
+  tempSpan.style.visibility = "hidden";
+  tempSpan.className = "word";
+  tempSpan.textContent = word;
+  containerRef.current.appendChild(tempSpan);
+  const style = getComputedStyle(tempSpan);
+
+  const wordWidth = tempSpan.offsetWidth + parseInt(style.marginLeft) + parseInt(style.marginRight);
+
+  containerRef.current.removeChild(tempSpan);
+
+  return wordWidth;
+};

@@ -3,3 +3,10 @@ export type Setting = {
   settingValue: number;
   settingOptions: number[];
 };
+
+export type Lines = {
+  firstDisplayedWord: number;
+  previousLines: string[][];
+  currentLine: string[];
+  nextLines: string[][];
+};

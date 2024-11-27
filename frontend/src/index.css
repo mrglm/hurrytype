@@ -1,4 +1,4 @@
-:root {
+body {
   font-family: "Fira Code", monospace;
   line-height: 1.5;
   font-weight: 400;
@@ -12,6 +12,13 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 75%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
 a {
@@ -61,10 +68,24 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+main {
+  width: 100%;
+}
+
 .words-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  overflow: hidden;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  max-height: calc(3 * 1.75em);
+  width: 100%;
+}
+
+.line {
+  display: flex;
+  width: 100%;
+  justify-content: left;
 }
 
 .word {
@@ -74,6 +95,7 @@ button:focus-visible {
   margin-right: 0.5em;
   margin-bottom: 0.2em;
   font-size: 25px;
+  white-space: nowrap;
 }
 
 .correct {

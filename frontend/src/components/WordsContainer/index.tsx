@@ -1,8 +1,8 @@
 import Word from "../Word";
-import React, { useCallback, useEffect, useState } from "react";
-import { Setting } from "../../types";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Lines, Setting } from "../../types";
 import { apiFetchWords } from "../../api";
-import { isFinishedWords } from "../../utils";
+import { isFinishedWords, measureWordWidth } from "../../utils";
 import { isFinishedMistakes } from "../../utils";
 
 type WordsContainerProps = {
@@ -31,11 +31,19 @@ const WordsContainer = ({
   const [typedWordsIndex, setTypedWordsIndex] = useState<number>(0);
 
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setisLoading] = useState<boolean>(false);
+  const [isLoading, setisLoading] = useState<boolean>(true);
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [containerWidth, setContainerWidth] = useState<number | null>(null);
+  const [lines, setLines] = useState<Lines>({
+    firstDisplayedWord: 0,
+    previousLines: [],
+    currentLine: [],
+    nextLines: [],
+  });
 
   useEffect(() => {
     const async_helper = async () => {
-      setisLoading(true);
       try {
         const fetchedWords = await apiFetchWords(
           selectedSetting.settingName === "Words" ? selectedSetting.settingValue : 1000,
@@ -116,24 +124,174 @@ const WordsContainer = ({
     typedWordsIndex,
   ]);
 
+  useEffect(() => {
+    const updateWidth = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.clientWidth);
+      }
+    };
+
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.clientWidth);
+    }
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  useEffect(() => {
+    if (!containerWidth || challengeWords.length === 0) {
+      return;
+    }
+
+    const previousLines: string[][] = [];
+    let currentLine: string[] = [];
+    const nextLines: string[][] = [];
+    let tempLine: string[] = [];
+    let currentWidth = 0;
+    let firstDisplayedWord = 0;
+
+    challengeWords.forEach((word, wordIndex) => {
+      const wordWidth = measureWordWidth(word, containerRef);
+
+      if (currentWidth + wordWidth > containerWidth) {
+        if (wordIndex <= typedWordsIndex) {
+          previousLines.push(tempLine);
+          firstDisplayedWord = wordIndex - tempLine.length;
+        } else if (currentLine.length === 0) {
+          currentLine = tempLine;
+        } else {
+          nextLines.push(tempLine);
+        }
+        tempLine = [];
+        currentWidth = 0;
+      }
+
+      tempLine.push(word);
+      currentWidth += wordWidth;
+    });
+
+    if (tempLine.length > 0) {
+      if (currentLine.length === 0) {
+        currentLine = tempLine;
+      } else {
+        nextLines.push(tempLine);
+      }
+    }
+
+    if (nextLines.length === 0 && previousLines.length > 1) {
+      firstDisplayedWord -= previousLines[previousLines.length - 2].length;
+    }
+
+    setLines({
+      previousLines,
+      currentLine,
+      nextLines,
+      firstDisplayedWord,
+    });
+  }, [challengeWords, containerWidth, typedWordsIndex]);
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="words-container" ref={containerRef}>
+        Loading...
+      </div>
+    );
   }
 
   if (error) {
     return <div>Error: {error}</div>;
   }
+
+  const currentLine = lines.currentLine;
+  const previousFillerLine =
+    lines.nextLines.length === 0 && lines.previousLines.length > 1
+      ? lines.previousLines[lines.previousLines.length - 2]
+      : [];
+  const previousLine = lines.previousLines.length > 0 ? lines.previousLines[lines.previousLines.length - 1] : [];
+  const nextLine = lines.nextLines.length > 0 ? lines.nextLines[0] : [];
+  const nextFillerLine = lines.previousLines.length === 0 && lines.nextLines.length > 1 ? lines.nextLines[1] : [];
+
+  const previousFillerLineIndex = lines.firstDisplayedWord;
+  const previousLineIndex = previousFillerLineIndex + previousFillerLine.length;
+  const currentLineIndex = previousLineIndex + previousLine.length;
+  const nextLineIndex = currentLineIndex + currentLine.length;
+  const nextFillerLineIndex = nextLineIndex + nextLine.length;
+
   return (
-    <div className="words-container">
-      {challengeWords.map((_, wordIndex) => (
-        <Word
-          key={wordIndex}
-          challengeWord={challengeWords[wordIndex]}
-          typedWord={typedWords[wordIndex] ?? ""}
-          progressStatus={wordIndex === typedWordsIndex ? "current" : wordIndex < typedWordsIndex ? "done" : ""}
-          updateNbMistakes={updateNbMistakes}
-        />
-      ))}
+    <div className="words-container" ref={containerRef}>
+      {previousFillerLine.length > 0 && (
+        <div className="line previous-line filler-line">
+          {previousFillerLine.map((word, wordIndex) => (
+            <Word
+              key={`${previousFillerLineIndex + wordIndex}`}
+              challengeWord={word}
+              typedWord={typedWords[previousFillerLineIndex + wordIndex] ?? ""}
+              progressStatus="done"
+              updateNbMistakes={updateNbMistakes}
+            />
+          ))}
+        </div>
+      )}
+
+      {previousLine.length > 0 && (
+        <div className="line previous-line">
+          {previousLine.map((word, wordIndex) => (
+            <Word
+              key={`${previousLineIndex + wordIndex}`}
+              challengeWord={word}
+              typedWord={typedWords[previousLineIndex + wordIndex] ?? ""}
+              progressStatus="done"
+              updateNbMistakes={updateNbMistakes}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="line current-line">
+        {currentLine.map((word, wordIndex) => (
+          <Word
+            key={`${currentLineIndex + wordIndex}`}
+            challengeWord={word}
+            typedWord={typedWords[currentLineIndex + wordIndex] ?? ""}
+            progressStatus={
+              currentLineIndex + wordIndex === typedWordsIndex
+                ? "current"
+                : currentLineIndex + wordIndex < typedWordsIndex
+                  ? "done"
+                  : ""
+            }
+            updateNbMistakes={updateNbMistakes}
+          />
+        ))}
+      </div>
+
+      {nextLine.length > 0 && (
+        <div className="line next-line">
+          {nextLine.map((word, wordIndex) => (
+            <Word
+              key={`${nextLineIndex + wordIndex}`}
+              challengeWord={word}
+              typedWord=""
+              progressStatus=""
+              updateNbMistakes={updateNbMistakes}
+            />
+          ))}
+        </div>
+      )}
+
+      {nextFillerLine.length > 0 && (
+        <div className="line next-line">
+          {nextFillerLine.map((word, wordIndex) => (
+            <Word
+              key={`${nextFillerLineIndex + wordIndex}`}
+              challengeWord={word}
+              typedWord=""
+              progressStatus=""
+              updateNbMistakes={updateNbMistakes}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
