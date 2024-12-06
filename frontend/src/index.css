@@ -107,7 +107,7 @@ main {
   color: darkred;
 }
 
-.done :not(.correct, .incorrect) {
+.skipped {
   text-decoration: underline darkred 3px;
 }
 

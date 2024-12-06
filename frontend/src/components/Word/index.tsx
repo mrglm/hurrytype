@@ -17,6 +17,7 @@ const Word = ({ challengeWord, typedWord, progressStatus, updateNbMistakes }: Wo
           key={`${index}-${challengeWord.charAt(index)}-${typedWord.charAt(index)}`}
           challengeChar={challengeWord.charAt(index)}
           typedChar={typedWord.charAt(index)}
+          wordProgessStatus={progressStatus}
           updateNbMistakes={updateNbMistakes}
         />
       ))}

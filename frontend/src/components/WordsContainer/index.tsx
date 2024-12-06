@@ -258,7 +258,7 @@ const WordsContainer = ({
                 ? "current"
                 : currentLineIndex + wordIndex < typedWordsIndex
                   ? "done"
-                  : ""
+                  : "future"
             }
             updateNbMistakes={updateNbMistakes}
           />
@@ -272,7 +272,7 @@ const WordsContainer = ({
               key={`${nextLineIndex + wordIndex}`}
               challengeWord={word}
               typedWord=""
-              progressStatus=""
+              progressStatus="future"
               updateNbMistakes={updateNbMistakes}
             />
           ))}
@@ -286,7 +286,7 @@ const WordsContainer = ({
               key={`${nextFillerLineIndex + wordIndex}`}
               challengeWord={word}
               typedWord=""
-              progressStatus=""
+              progressStatus="future"
               updateNbMistakes={updateNbMistakes}
             />
           ))}
