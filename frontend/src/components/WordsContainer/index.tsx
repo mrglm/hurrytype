@@ -151,7 +151,8 @@ const WordsContainer = ({
     let firstDisplayedWord = 0;
 
     challengeWords.forEach((word, wordIndex) => {
-      const wordWidth = measureWordWidth(word, containerRef);
+      const typedWord = typedWordsIndex <= wordIndex ? typedWords[wordIndex] : "";
+      const wordWidth = Math.max(measureWordWidth(typedWord, containerRef), measureWordWidth(word, containerRef));
 
       if (currentWidth + wordWidth > containerWidth) {
         if (wordIndex <= typedWordsIndex) {
@@ -188,7 +189,7 @@ const WordsContainer = ({
       nextLines,
       firstDisplayedWord,
     });
-  }, [challengeWords, containerWidth, typedWordsIndex]);
+  }, [challengeWords, containerWidth, typedWords, typedWordsIndex]);
 
   if (isLoading) {
     return (
